@@ -6,7 +6,7 @@ A Python script to extract text from files within a zip archive and store the fi
 
 1. Clone the repository:
    ```
-   git clone [https://github.com/yourusername/zip-text-extractor.git](https://github.com/AmirFone/zip-text-extractor.git)
+   git clone https://github.com/AmirFone/zip-text-extractor.git
    ```
 
 2. Navigate to the repository directory:
