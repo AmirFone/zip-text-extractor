@@ -70,3 +70,4 @@ with open(output_file, 'w') as json_file:
     json.dump(text_data, json_file, indent=4)
 
 print(f"Text extraction completed. Results saved to {output_file}.")
+ 
