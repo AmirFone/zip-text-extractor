@@ -1,5 +1,5 @@
 #!/bin/sh
-'''exec' "/Users/amirhossain/Desktop/projects /zip-text-extractor/FLASK APP/venv/bin/python" "$0" "$@"
+'''exec' "/Users/amirhossain/Desktop/zip-text-extractor/FLASK APP/venv/bin/python" "$0" "$@"
 ' '''
 # -*- coding: utf-8 -*-
 import re

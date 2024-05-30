@@ -6,7 +6,7 @@ import PyPDF2
 from pptx import Presentation
 from docx import Document
 import pickle
-from transformers import GPT2TokenizerFast
+# from transformers import GPT2TokenizerFast
 from flask import Flask, request, render_template, jsonify
 
 app = Flask(__name__)
@@ -74,10 +74,10 @@ def extract_text_from_zip(zip_file, file_path):
     return result, skipped_files
 
 def count_tokens(text_data):
-    tokenizer = GPT2TokenizerFast.from_pretrained('Xenova/gpt-4')
     json_string = json.dumps(text_data)
-    tokens = tokenizer.tokenize(json_string)
-    return len(tokens)
+    total_characters = len(json_string)
+    estimated_tokens = total_characters // 4
+    return estimated_tokens
 
 @app.route('/', methods=['GET', 'POST'])
 def upload_file():

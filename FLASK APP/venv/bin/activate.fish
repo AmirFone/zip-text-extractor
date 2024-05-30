@@ -29,7 +29,7 @@ end
 # Unset irrelevant variables.
 deactivate nondestructive
 
-set -gx VIRTUAL_ENV "/Users/amirhossain/Desktop/projects /zip-text-extractor/FLASK APP/venv"
+set -gx VIRTUAL_ENV "/Users/amirhossain/Desktop/zip-text-extractor/FLASK APP/venv"
 
 set -gx _OLD_VIRTUAL_PATH $PATH
 set -gx PATH "$VIRTUAL_ENV/bin" $PATH

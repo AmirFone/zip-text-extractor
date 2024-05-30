@@ -1,4 +1,4 @@
-#!/Users/amirhossain/Desktop/projects /zip-text-extractor/FLASK APP/venv/bin/python
+#!/Users/amirhossain/Desktop/zip-text-extractor/FLASK APP/venv/bin/python
 
 ##############################################################################
 #
