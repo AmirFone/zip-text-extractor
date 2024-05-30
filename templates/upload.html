@@ -1,13 +1,238 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Document Upload</title>
+    <title>Zip to JSON Object</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f4f4f9;
+            color: #333;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .intro {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #555;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .intro p {
+            margin: 0;
+            padding: 0 20px;
+        }
+        .intro .highlight {
+            color: #3498db;
+            font-weight: bold;
+        }
+        form {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        #dropzone {
+            border: 2px dashed #ccc;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 20px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+        #dropzone:hover {
+            background: #f9f9f9;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        }
+        #result {
+            margin-top: 20px;
+            padding: 20px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+        #json-data {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: monospace;
+            font-size: 14px;
+            background: #f4f4f9;
+            padding: 10px;
+            border-radius: 10px;
+            color: #333;
+            overflow: auto;
+        }
+        .loading {
+            display: none;
+            margin-top: 20px;
+            text-align: center;
+        }
+        .loading img {
+            width: 30px;
+            height: 30px;
+        }
+        .button {
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s;
+        }
+        .button:hover {
+            background-color: #2980b9;
+        }
+        .color-legend {
+            margin-bottom: 10px;
+        }
+        .color-legend span {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            margin-right: 5px;
+            vertical-align: middle;
+        }
+        .color-green {
+            background-color: #2ecc71;
+        }
+        .color-yellow {
+            background-color: #f1c40f;
+        }
+        .color-red {
+            background-color: #e74c3c;
+        }
+    </style>
+    <script>
+        $(document).ready(function() {
+            $('#dropzone').on('dragover', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                $(this).css('background-color', '#f9f9f9');
+            });
+
+            $('#dropzone').on('dragleave', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                $(this).css('background-color', '#fff');
+            });
+
+            $('#dropzone').on('drop', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                $(this).css('background-color', '#fff');
+
+                var file = e.originalEvent.dataTransfer.files[0];
+                var formData = new FormData();
+                formData.append('file', file);
+
+                submitForm(formData);
+            });
+
+            $('form').submit(function(event) {
+                event.preventDefault();
+                var formData = new FormData(this);
+                submitForm(formData);
+            });
+
+            $('#copy-button').click(function() {
+                var jsonData = document.getElementById('json-data');
+                var range = document.createRange();
+                range.selectNode(jsonData);
+                window.getSelection().removeAllRanges();
+                window.getSelection().addRange(range);
+                document.execCommand('copy');
+                window.getSelection().removeAllRanges();
+                alert('JSON data copied to clipboard!');
+            });
+
+            function submitForm(formData) {
+                $('.loading').show();
+                $.ajax({
+                    url: '/',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        $('.loading').hide();
+                        var tokenCount = response.token_count;
+                        var colorClass = '';
+                        if (tokenCount < 50000) {
+                            colorClass = 'color-green';
+                        } else if (tokenCount < 100000) {
+                            colorClass = 'color-yellow';
+                        } else {
+                            colorClass = 'color-red';
+                        }
+                        $('#token-count').html('<span class="' + colorClass + '"></span> Total token count: ' + tokenCount);
+                        $('#skipped-files').empty();
+                        if (response.skipped_files.length > 0) {
+                            $('#skipped-files').append('<p>Skipped files:</p>');
+                            var list = $('<ul>');
+                            response.skipped_files.forEach(function(file) {
+                                list.append('<li>' + file + '</li>');
+                            });
+                            $('#skipped-files').append(list);
+                        }
+                        $('#json-data').text(JSON.stringify(response.text_data, null, 2));
+                        hljs.highlightElement($('#json-data')[0]);
+                        $('#result').show();
+                    }
+                });
+            }
+        });
+    </script>
 </head>
 <body>
-    <h1>Upload a Document</h1>
-    <form action="/" method="POST" enctype="multipart/form-data">
+    <h1>Zip to JSON Object</h1>
+    <div class="intro">
+        <p>This tool is designed to help <span class="highlight">Large Language Models</span> understand your file structure by allowing you to upload multiple documents as a single object. This is particularly useful for complex projects, as it ensures that all your files and code are easily accessible and analyzable.</p>
+    </div>
+    <form>
         <input type="file" name="file">
-        <input type="submit" value="Upload">
+        <input type="submit" value="Upload" class="button">
     </form>
+
+    <div id="dropzone">
+        <p>Drag and drop a file here</p>
+    </div>
+
+    <div class="loading">
+        <img src="loading.gif" alt="Loading...">
+        <p>Processing file, please wait...</p>
+    </div>
+
+    <div id="result">
+        <h2>Result</h2>
+        <p id="token-count"></p>
+        <div class="color-legend">
+            <span class="color-green"></span> &lt; 50K tokens
+            <span class="color-yellow"></span> 50K - 100K tokens
+            <span class="color-red"></span> &gt; 100K tokens
+        </div>
+        <div id="skipped-files"></div>
+        <button id="copy-button" class="button">Copy JSON</button>
+        <h3>JSON Data</h3>
+        <pre><code id="json-data"></code></pre>
+    </div>
+
+    <footer style="text-align: center; padding: 20px; background: #333; color: #fff; position: fixed; width: 100%; bottom: 0;">
+        <p>&copy; 2024 Amir. All rights reserved.</p>
+        <p>Follow me on:
+            <a href="https://github.com/Amirfone" style="color: #3498db; text-decoration: none;">GitHub</a> |
+            <a href="https://linkedin.com/in/amir-h-730571203" style="color: #3498db; text-decoration: none;">LinkedIn</a>
+        </p>
+    </footer>
 </body>
 </html>
